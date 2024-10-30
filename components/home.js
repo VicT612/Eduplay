@@ -19,17 +19,17 @@ export default function Home() {
     },
     {
       titulo: 'ANIMALES',
-      imagen: require('../assets/images/cards.jpg'),
+      imagen: require('../assets/images/animales.jpg'),
       routeName: 'JuegoAnimales',
     },
     {
       titulo: 'COLORES',
-      imagen: require('../assets/images/cards.jpg'),
+      imagen: require('../assets/images/colores.jpeg'),
       routeName: 'JuegoColores',
     },
     {
       titulo: 'FIGURAS',
-      imagen: require('../assets/images/cards.jpg'),
+      imagen: require('../assets/images/figuras.jpeg'),
       routeName: 'JuegoFiguras', 
     }
   ];
