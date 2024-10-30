@@ -1,22 +1,37 @@
-import React, { useState } from 'react';
-import { View, Text, PanResponder, Animated, StyleSheet, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, PanResponder, Animated, StyleSheet, Modal, Dimensions } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
 
-const figuras = ["star", "heart", "triangle", "square", "ellipse", "hexagon"];
+const figuras = ["star", "heart", "triangle", "square", "octagon", "diamond"];
 
-function generarFiguraAleatoria() {
-    return figuras[Math.floor(Math.random() * figuras.length)];
+// Función para obtener cuatro figuras aleatorias
+function generarFigurasAleatorias() {
+    let seleccionadas = [];
+    while (seleccionadas.length < 4) {
+        const figura = figuras[Math.floor(Math.random() * figuras.length)];
+        if (!seleccionadas.includes(figura)) {
+            seleccionadas.push(figura);
+        }
+    }
+    return seleccionadas;
 }
 
-export default function JuegoFiguras() {
-    const [figuraObjetivo] = useState(generarFiguraAleatoria);
+export default function EnhancedFigurasGame() {
+    const [figuraObjetivo, setFiguraObjetivo] = useState('');
+    const [figurasAleatorias, setFigurasAleatorias] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [resultadoTexto, setResultadoTexto] = useState('');
-    
+
+    useEffect(() => {
+        const nuevasFiguras = generarFigurasAleatorias();
+        setFigurasAleatorias(nuevasFiguras);
+        setFiguraObjetivo(nuevasFiguras[Math.floor(Math.random() * nuevasFiguras.length)]);
+    }, []);
+
     const crearPanResponder = (figura) => {
         const position = new Animated.ValueXY();
-        
+
         const panResponder = PanResponder.create({
             onStartShouldSetPanResponder: () => true,
             onPanResponderMove: Animated.event(
@@ -24,21 +39,21 @@ export default function JuegoFiguras() {
                 { useNativeDriver: false }
             ),
             onPanResponderRelease: () => {
-                // Verificar si la figura es correcta
                 if (figura === figuraObjetivo) {
                     setResultadoTexto('¡Correcto!');
+                    const nuevasFiguras = generarFigurasAleatorias();
+                    setFigurasAleatorias(nuevasFiguras);
+                    setFiguraObjetivo(nuevasFiguras[Math.floor(Math.random() * nuevasFiguras.length)]);
                 } else {
                     setResultadoTexto('Incorrecto. Intenta de nuevo');
                 }
                 setModalVisible(true);
-                
-                // Regresar la figura a su posición inicial
+
                 Animated.spring(position, {
                     toValue: { x: 0, y: 0 },
                     useNativeDriver: false,
                 }).start();
-                
-                // Ocultar el modal después de 1 segundo
+
                 setTimeout(() => {
                     setModalVisible(false);
                 }, 1000);
@@ -50,27 +65,24 @@ export default function JuegoFiguras() {
 
     return (
         <LinearGradient
-        colors={['#0B0A4C', '#4B169D']}
-        style={styles.container}>
-            
+            colors={['#0B0A4C', '#4B169D']}
+            style={styles.container}
+        >
             <Text style={styles.titulo}>Arrastra el icono correcto</Text>
             
             <View style={styles.figuraObjetivo}>
                 <Ionicons name={figuraObjetivo} size={50} color="black" />
             </View>
-            
 
             <View style={styles.opciones}>
-                {figuras.map((figura) => {
+                {figurasAleatorias.map((figura) => {
                     const { position, panResponder } = crearPanResponder(figura);
                     return (
                         <Animated.View
                             key={figura}
                             style={[
                                 styles.figuraOpcion,
-                                {
-                                    transform: position.getTranslateTransform()
-                                }
+                                { transform: position.getTranslateTransform() }
                             ]}
                             {...panResponder.panHandlers}
                         >
@@ -100,7 +112,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-       
+        paddingHorizontal: 20,
     },
     titulo: {
         fontSize: 24,
@@ -121,8 +133,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'center',
-        gap: 20,
+        width: '100%',
         paddingHorizontal: 20,
+        gap: 20,
     },
     figuraOpcion: {
         width: 70,

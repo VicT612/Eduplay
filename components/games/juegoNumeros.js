@@ -20,14 +20,18 @@ export default function JuegoNumeros() {
   const [secondNumber, setSecondNumber] = useState(0);
   const [currentNumber, setCurrentNumber] = useState('first');
   const [result, setResult] = useState(null);
+  const [isDisabled, setIsDisabled] = useState(false); // Nueva variable de estado
 
   const handleNumberPress = (number) => {
+    if (isDisabled) return; // Evita el clic si está deshabilitado
+
     if (currentNumber === 'first') {
       setFirstNumber(number);
       setCurrentNumber('second');
     } else {
       setSecondNumber(number);
       setResult(firstNumber + number);
+      setIsDisabled(true); // Deshabilita los botones
       setTimeout(() => {
         resetGame();
       }, 3000);
@@ -39,6 +43,7 @@ export default function JuegoNumeros() {
     setSecondNumber(0);
     setCurrentNumber('first');
     setResult(null);
+    setIsDisabled(false); // Habilita los botones nuevamente
   };
 
   const renderBalls = (numBalls) => {
@@ -115,6 +120,7 @@ export default function JuegoNumeros() {
               key={number}
               style={styles.numberButton}
               onPress={() => handleNumberPress(number)}
+              disabled={isDisabled} // Deshabilita el botón si isDisabled es true
             >
               <Text style={styles.numberText}>{number}</Text>
             </TouchableOpacity>
